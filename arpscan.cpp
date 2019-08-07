@@ -77,7 +77,7 @@ public:
     epoller() : epoll_fd_(epoll_create1(EPOLL_CLOEXEC))
     {
         if (epoll_fd_ == -1)
-            throw_system_error("Failed to create epoll fd", errno);
+            throw_system_error("epoll_create", errno);
     }
 
     ~epoller()
@@ -244,15 +244,15 @@ private:
     {
         sender_fd_ = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ARP));
         if (sender_fd_ == -1)
-            throw_system_error(errno);
+            throw_system_error("socket", errno);
 
         recver_fd_ = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ARP));
         if (recver_fd_ == -1)
-            throw_system_error(errno);
+            throw_system_error("socket", errno);
 
         ifindex_ = if_nametoindex(ifname.c_str());
         if (ifindex_ == 0)
-            throw_system_error(errno);
+            throw_system_error(ifname, errno);
 
         this->get_if_info(sender_fd_, ifname);
     }
@@ -314,7 +314,7 @@ private:
 
             if (sendto(sender_fd_, frame.data(), frame.size(), 0,
                         reinterpret_cast<struct sockaddr *>(&sll), sizeof (sll)) == -1)
-                throw_system_error(errno);
+                throw_system_error("sendto", errno);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
@@ -343,7 +343,7 @@ private:
                 auto ret = recvfrom(recver_fd_, frame.data(), frame.size(), 0,
                         reinterpret_cast<struct sockaddr *>(&sll), &socklen);
                 if (ret == -1)
-                    throw_system_error(errno);
+                    throw_system_error("recvfrom", errno);
 
                 assert(static_cast<size_t>(ret) >= (arp_packet_size));
 
