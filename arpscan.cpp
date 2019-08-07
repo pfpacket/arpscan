@@ -305,12 +305,9 @@ private:
 
             struct sockaddr_ll sll{};
             sll.sll_family = AF_PACKET;
-            sll.sll_protocol = htons(ETH_P_ARP);
             sll.sll_ifindex = ifindex_;
-            sll.sll_hatype = htons(ARPHRD_ETHER);
-            sll.sll_pkttype = PACKET_BROADCAST;
             sll.sll_halen = ETH_ALEN;
-            std::memcpy(&sll.sll_addr, &arp->ar_tip, ETH_ALEN);
+            std::memcpy(&sll.sll_addr, &eth->h_dest, ETH_ALEN);
 
             if (sendto(sender_fd_, frame.data(), frame.size(), 0,
                         reinterpret_cast<struct sockaddr *>(&sll), sizeof (sll)) == -1)
