@@ -254,6 +254,14 @@ private:
         if (ifindex_ == 0)
             throw_system_error(ifname, errno);
 
+        struct sockaddr_ll sll{};
+        sll.sll_family = AF_PACKET;
+        sll.sll_protocol = htons(ETH_P_ARP);
+        sll.sll_ifindex = ifindex_;
+
+        if (::bind(recver_fd_, reinterpret_cast<struct sockaddr *>(&sll), sizeof (sll)) == -1)
+            throw_system_error("bind", errno);
+
         this->get_if_info(sender_fd_, ifname);
     }
 
