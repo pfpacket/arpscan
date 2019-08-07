@@ -208,7 +208,7 @@ class arp_scanner {
 public:
     arp_scanner(const std::string& ifname) : ifname_(ifname)
     {
-        this->init_packet_socket(ifname_);
+        this->init(ifname_);
     }
 
     ~arp_scanner()
@@ -240,7 +240,7 @@ public:
     }
 
 private:
-    void init_packet_socket(const std::string& ifname)
+    void init(const std::string& ifname)
     {
         sender_fd_ = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ARP));
         if (sender_fd_ == -1)
